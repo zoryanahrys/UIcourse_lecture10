@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        div{
+            width: 960px;
+            margin: 0 auto;
+            padding-top: 50px;
+            text-align: center;
+            background-color: pink;
+            border-radius: 25px;
+            height: 100%;
+        }
+        h1{
+            color: grey;
+            font-weight: bold;
+        }
+        p{
+            font-size: 25px;
+            font-weight: bold;
+            color: grey;
+        }
+        form{
+        margin-bottom: 20px;
+        }
+        #username{
+            width: 400px;
+            height: 20px;
+            padding-left: 5px;
+            border-radius: 7px;
+            border: 2px solid;
+            border-color: grey;
+        }
+        #add{
+            width: 100px;
+            height: 30px;
+            border-radius: 7px;
+            border-color: grey;
+            background-color: #ffe1e6;
+            color: grey;
+            font-weight: 600;
+        }
+        #wrongName{
+            display: none;
+            color: red;
+            font-weight: bold;
+        }
+        #error{
+            display: none;
+            color: red;
+            font-weight: bold;
+        }
+        #list{
+            padding: 0;
+        }
+        .user{
+            background-color: #ffe0e5;
+            color: grey;
+            margin-top: 10px;
+            padding-top: 10px;
+            text-align: left;
+        }
+        .ul{
+            list-style: none;
+        }
+        img{
+            float: left;
+            margin: 10px;
+            width: 100px;
+            border: 4px solid;
+            border-color: #aaaaaa;
+            border-radius: 5px;
+        }
+        .name{
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div>
+       <h1>JavaScript. Communication with server</h1>
+       <p>Write your username:</p>
+        <form>
+            <input name="username" type="text" id="username" placeholder="your username">
+            <input name="add" type="button" id="add" value="Add">
+            <p id="wrongName">Wrong user name!</p>
+            <p id="error">Error!</p>
+        </form>
+        <div id="list"></div>
+    </div>
+    
+    
+    <script>
+        
+        for (var i=0, key; i<localStorage.length; i++){
+            key = localStorage.key(i);
+         user(JSON.parse(localStorage.getItem(key)));
+    };
+        var add = document.getElementById('add');
+        var url;
+        add.onclick = function () {
+            document.getElementById('error').style.display="none";
+        var username = document.getElementById('username').value;
+            url = 'https://api.github.com/users/' + username;
+        makeCorsRequest (url);
+    };
+
+
+        function createCORSRequest(method, url) {
+            var xhr = new XMLHttpRequest();
+            xhr.open(method, url, true);
+            return xhr;
+         };
+
+        function makeCorsRequest(url) {
+            var xhr = createCORSRequest('GET', url);
+
+            xhr.onload = function () {
+                var responseText = JSON.parse(xhr.responseText);
+                
+                var wrongName = document.getElementById('wrongName');
+                if (responseText.message == "Not Found"){
+                    wrongName.style.display = "block";
+                } else {
+                    wrongName.style.display = "none";
+                    localStorage.setItem(responseText.login, JSON.stringify(responseText));            
+                    user(responseText);
+                    };
+            };
+
+            xhr.onerror = function () {
+                document.getElementById('error').style.display="block";
+            };
+
+            xhr.send();
+        };
+
+        function user (obj) {
+            var list = document.getElementById('list');
+            list.insertAdjacentHTML ("afterBegin", "<div class='user'><img src='"+obj.avatar_url+"' alt='image'><ul class='ul'><li class='name'>"+obj.name+"</li><br><li>UserID: <span>"+obj.id+"</span></li><br><li>AccType: <span>"+obj.type+"</span></li></ul></div>");
+                };
+    </script>
+</body>
+</html>
